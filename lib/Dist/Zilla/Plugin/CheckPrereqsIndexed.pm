@@ -1,5 +1,22 @@
 package Dist::Zilla::Plugin::CheckPrereqsIndexed;
 use Moose;
+# ABSTRACT: prevent a release if you have prereqs not found on CPAN
+
+=head1 OVERVIEW
+
+Sometimes, AutoPrereqs is a little overzealous and finds a prereq that you
+wrote inline or have in your F<./t> directory.  Although AutoPrereqs should
+grow more accurate over time, and avoid these mistakes, it's not perfect right
+now.  CheckPrereqsIndexed will check every required package against the CPAN
+index to ensure that they're all real, installable packages.
+
+If any are unknown, it will prompt the user to continue or abort.
+
+At present, CheckPrereqsIndexed queries CPANMetaDB, but this behavior is likely
+to change or become pluggable in the future.  In the meantime, this makes
+releasing while offline impossible... but it was anyway, right?
+
+=cut
 
 with 'Dist::Zilla::Role::BeforeRelease';
 
