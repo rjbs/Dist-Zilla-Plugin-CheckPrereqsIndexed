@@ -31,8 +31,9 @@ sub before_release {
   my $prereqs  = $self->zilla->prereqs->as_string_hash;
 
   my @packages = sort { $a cmp $b } uniq
-                 map {; keys %$_ }
-                 map {; values %$_ }
+                 grep { $_ ne 'perl' } # special case -- rjbs, 2011-02-05
+                 map  {; keys %$_ }
+                 map  {; values %$_ }
                  values %$prereqs;
 
   return unless @packages; # no prereqs!?

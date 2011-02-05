@@ -1,5 +1,6 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          "perl" is never considered an unindexed prereq
 
 0.001     2011-02-04 18:09:37 America/New_York
