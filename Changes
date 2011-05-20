@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          "Config" is never considered an unindexed prereq
 
 0.002     2011-02-05 15:14:56 America/New_York
           "perl" is never considered an unindexed prereq

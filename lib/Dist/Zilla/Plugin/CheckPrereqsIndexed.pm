@@ -31,6 +31,7 @@ sub before_release {
   my $prereqs  = $self->zilla->prereqs->as_string_hash;
 
   my @packages = sort { $a cmp $b } uniq
+                 grep { $_ ne 'Config' } # special case -- rjbs, 2011-05-20
                  grep { $_ ne 'perl' } # special case -- rjbs, 2011-02-05
                  map  {; keys %$_ }
                  map  {; values %$_ }
