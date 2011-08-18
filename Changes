@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.004     2011-08-18 11:05:31 America/New_York
           the plugin now complains if CPAN has the package you want, but not of
           the required version or higher
 
