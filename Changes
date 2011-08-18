@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          the plugin now complains if CPAN has the package you want, but not of
+          the required version or higher
 
 0.003     2011-05-20 08:59:43 America/New_York
           "Config" is never considered an unindexed prereq
