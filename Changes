@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          the LWP::UserAgent should now respect HTTP proxies specified by the
+          environment (Thanks, Piers Cawley!)
 
 0.004     2011-08-18 11:05:31 America/New_York
           the plugin now complains if CPAN has the package you want, but not of
