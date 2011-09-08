@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.005     2011-09-08 08:35:50 America/New_York
           the LWP::UserAgent should now respect HTTP proxies specified by the
           environment (Thanks, Piers Cawley!)
 
