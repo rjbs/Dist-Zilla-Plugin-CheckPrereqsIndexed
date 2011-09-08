@@ -59,6 +59,7 @@ sub before_release {
   return unless keys %requirement; # no prereqs!?
 
   my $ua = LWP::UserAgent->new(keep_alive => 1);
+  $ua->env_proxy;
 
   my %missing;
   my %too_new;
