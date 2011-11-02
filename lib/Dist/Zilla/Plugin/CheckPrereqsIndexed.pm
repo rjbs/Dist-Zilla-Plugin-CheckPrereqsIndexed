@@ -30,10 +30,32 @@ use YAML::XS qw(Load);
 
 use namespace::autoclean;
 
+sub mvp_multivalue_args { qw(skips) }
+sub mvp_aliases { return { skip => 'skips' } }
+
+=attr skips
+
+This is an arrayref of regular expressions.  Any module names matching
+any of these regex will not be checked.  This should only be necessary
+if you have a prerequisite that is not available on CPAN (because it's
+distributed in some other way).
+
+=cut
+
+has skips => (
+  is      => 'ro',
+  isa     => 'ArrayRef[Str]',
+  default => sub { [] },
+);
+
+
 sub before_release {
   my ($self) = @_;
 
   my $prereqs_hash  = $self->zilla->prereqs->as_string_hash;
+
+  # Config & perl are special cases (rjbs, 2011-05-20 & 2011-02-05)
+  my @skips = (qw(Config perl), map { qr/$_/ } @{ $self->skips });
 
   my %requirement;
 
@@ -41,8 +63,7 @@ sub before_release {
   # everything -- rjbs, 2011-08-18
   for my $req_set (map { values %$_ } values %$prereqs_hash) {
     REQ_PKG: for my $pkg (keys %$req_set) {
-      next if $pkg eq 'Config'; # special case -- rjbs, 2011-05-20
-      next if $pkg eq 'perl';   # special case -- rjbs, 2011-02-05
+      next if $pkg ~~ @skips;
 
       my $ver   = $req_set->{$pkg};
 

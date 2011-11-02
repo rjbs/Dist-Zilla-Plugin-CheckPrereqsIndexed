@@ -8,13 +8,14 @@ use lib 't/lib';
 use Test::DZil;
 
 sub new_tzil {
-  my ($corpus_dir) = @_;
+  my ($corpus_dir, @skips) = @_;
   my $tzil = Builder->from_config(
     { dist_root => $corpus_dir },
     {
       add_files => {
         'source/dist.ini' => simple_ini(
-          qw(GatherDir AutoPrereqs CheckPrereqsIndexed FakeRelease)
+          qw(GatherDir AutoPrereqs FakeRelease),
+          [ CheckPrereqsIndexed => (@skips ? { skips => \@skips } : ()) ],
         ),
       },
     },
@@ -64,6 +65,14 @@ sub new_tzil {
   my $err = exception { $tzil->release };
 
   is($err, undef, "we released with no errors");
+}
+
+{
+  my $tzil = new_tzil('corpus/DZT', '^Zorch::');
+
+  my $err = exception { $tzil->release };
+
+  is($err, undef, "skipping Zorch:: allows release");
 }
 
 done_testing;
