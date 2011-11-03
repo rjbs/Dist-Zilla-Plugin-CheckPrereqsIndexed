@@ -22,15 +22,31 @@ sub new_tzil {
   );
 }
 
+# Write the log messages as diagnostics:
+sub diag_log
+{
+  my $tzil = shift;
+
+  # Output nothing if all tests passed:
+  my $all_passed = shift;
+  $all_passed &&= $_ for @_;
+
+  return if $all_passed;
+
+  diag(map { "$_\n" } @{ $tzil->log_messages });
+}
+
 {
   my $tzil = new_tzil('corpus/DZT');
 
   my $err = exception { $tzil->release };
 
-  like($err, qr/unindexed prereq/, "we aborted because we had weird prereqs");
-  ok(
-    (grep { /Zorch/ } @{ $tzil->log_messages }),
-    "and we specifically mentioned the one we expected",
+  diag_log( $tzil,
+    like($err, qr/unindexed prereq/, "we aborted because we had weird prereqs"),
+    ok(
+      (grep { /Zorch/ } @{ $tzil->log_messages }),
+      "and we specifically mentioned the one we expected",
+    ),
   );
 }
 
@@ -49,11 +65,12 @@ sub new_tzil {
 
   my $err = exception { $tzil->release };
 
-  like($err, qr/unindexed prereq/, "we aborted because we had weird prereqs");
-
-  ok(
-    (grep { /you required Dist::Zilla version 99/ } @{ $tzil->log_messages }),
-    "it complained that we wanted a too-new version",
+  diag_log( $tzil,
+    like($err, qr/unindexed prereq/, "we aborted because we had weird prereqs"),
+    ok(
+      (grep { /you required Dist::Zilla version 99/ } @{ $tzil->log_messages }),
+      "it complained that we wanted a too-new version",
+    ),
   );
 }
 
@@ -64,7 +81,7 @@ sub new_tzil {
 
   my $err = exception { $tzil->release };
 
-  is($err, undef, "we released with no errors");
+  diag_log($tzil, is($err, undef, "we released with no errors"));
 }
 
 {
@@ -72,7 +89,7 @@ sub new_tzil {
 
   my $err = exception { $tzil->release };
 
-  is($err, undef, "skipping Zorch:: allows release");
+  diag_log($tzil, is($err, undef, "skipping Zorch:: allows release"));
 }
 
 done_testing;
