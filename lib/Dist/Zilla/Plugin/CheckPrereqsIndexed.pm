@@ -23,7 +23,7 @@ releasing while offline impossible... but it was anyway, right?
 with 'Dist::Zilla::Role::BeforeRelease';
 
 use Encode qw(encode_utf8);
-use List::MoreUtils qw(uniq);
+use List::MoreUtils qw(any uniq);
 use LWP::UserAgent;
 use version ();
 use YAML::XS qw(Load);
@@ -48,14 +48,12 @@ has skips => (
   default => sub { [] },
 );
 
-
 sub before_release {
   my ($self) = @_;
 
   my $prereqs_hash  = $self->zilla->prereqs->as_string_hash;
 
-  # Config & perl are special cases (rjbs, 2011-05-20 & 2011-02-05)
-  my @skips = (qw(Config perl), map { qr/$_/ } @{ $self->skips });
+  my @skips = map {; qr/$_/ } @{ $self->skips };
 
   my %requirement;
 
@@ -63,9 +61,12 @@ sub before_release {
   # everything -- rjbs, 2011-08-18
   for my $req_set (map { values %$_ } values %$prereqs_hash) {
     REQ_PKG: for my $pkg (keys %$req_set) {
-      next if $pkg ~~ @skips;
+      next if $pkg eq 'Config'; # special case -- rjbs, 2011-05-20
+      next if $pkg eq 'perl';   # special case -- rjbs, 2011-02-05
 
-      my $ver   = $req_set->{$pkg};
+      next if any { $pkg =~ $_ } @skips;
+
+      my $ver = $req_set->{$pkg};
 
       $requirement{ $pkg } //= version->parse(0);
 
