@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.007     2011-11-07 17:58:42 America/New_York
+          switch from cpanmetadb to cpanidx while cpanmetadb is (temporarily?)
+          broken
+
 0.006     2011-11-03 10:15:25 America/New_York
           add the skips parameter (Thanks, Christopher J. Madsen!)
 
