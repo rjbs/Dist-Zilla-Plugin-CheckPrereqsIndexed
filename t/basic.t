@@ -36,7 +36,7 @@ sub diag_log
   diag(map { "$_\n" } @{ $tzil->log_messages });
 }
 
-{
+subtest "unknown prereqs" => sub {
   my $tzil = new_tzil('corpus/DZT');
 
   my $err = exception { $tzil->release };
@@ -48,9 +48,9 @@ sub diag_log
       "and we specifically mentioned the one we expected",
     ),
   );
-}
+};
 
-{
+subtest "too-new version" => sub {
   my $tzil = Builder->from_config(
     { dist_root => 'corpus/DZZ' },
     {
@@ -72,9 +72,9 @@ sub diag_log
       "it complained that we wanted a too-new version",
     ),
   );
-}
+};
 
-{
+subtest "stuff in our own dist" => sub {
   # This is to test that we don't have any problems with libraries that are in
   # our own dist.
   my $tzil = new_tzil('corpus/DZZ');
@@ -82,14 +82,14 @@ sub diag_log
   my $err = exception { $tzil->release };
 
   diag_log($tzil, is($err, undef, "we released with no errors"));
-}
+};
 
-{
+subtest "explicit skip" => sub {
   my $tzil = new_tzil('corpus/DZT', '^Zorch::');
 
   my $err = exception { $tzil->release };
 
   diag_log($tzil, is($err, undef, "skipping Zorch:: allows release"));
-}
+};
 
 done_testing;
