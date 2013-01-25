@@ -22,11 +22,7 @@ releasing while offline impossible... but it was anyway, right?
 
 with 'Dist::Zilla::Role::BeforeRelease';
 
-use Encode qw(encode_utf8);
 use List::MoreUtils qw(any uniq);
-use LWP::UserAgent;
-use version ();
-use JSON::PP;
 
 use namespace::autoclean;
 
@@ -50,6 +46,8 @@ has skips => (
 
 sub before_release {
   my ($self) = @_;
+
+  require version;
 
   my $prereqs_hash  = $self->zilla->prereqs->as_string_hash;
 
@@ -80,6 +78,10 @@ sub before_release {
 
   return unless keys %requirement; # no prereqs!?
 
+  require Encode;
+  require LWP::UserAgent;
+  require JSON;
+
   my $ua = LWP::UserAgent->new(keep_alive => 1);
   $ua->env_proxy;
 
@@ -95,8 +97,8 @@ sub before_release {
 
     # JSON wants UTF-8 bytestreams, so we need to re-encode no matter what
     # encoding we got. -- rjbs, 2011-08-18
-    my $yaml_octets = encode_utf8($res->decoded_content);
-    my $payload = JSON::PP->new->decode($yaml_octets);
+    my $yaml_octets = Encode::encode_utf8($res->decoded_content);
+    my $payload = JSON::->new->decode($yaml_octets);
 
     unless (@$payload) {
       $missing{ $pkg } = 1;
