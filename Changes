@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          RT#82883: lazy load dependencies (Thanks, Olivier Mengué)
+          RT#82886: use JSON instead of JSON::PP (Thanks, Olivier Mengué)
 
 0.007     2011-11-07 17:58:42 America/New_York
           switch from cpanmetadb to cpanidx while cpanmetadb is (temporarily?)
