@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.009     2013-05-29 19:11:54 America/New_York
           fix documentation: CPANIDX, not CPANMetaDB
 
 0.008     2013-01-25 13:24:30 America/New_York
