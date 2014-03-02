@@ -69,7 +69,7 @@ sub before_release {
       $requirement{ $pkg } //= version->parse(0);
 
       # we have a complex, stupid rule -- rjbs, 2011-08-18
-      next REQ_PKG if $ver =~ /<>=,\s/;
+      next REQ_PKG if not version::is_lax($ver);
 
       $requirement{ $pkg } = $ver
         if version->parse($ver) > $requirement{ $pkg };
