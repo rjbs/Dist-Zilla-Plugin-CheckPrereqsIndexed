@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - respect version ranges in requirements
+          (if you require (>1, <2) and the CPAN only has v3, check fails
 
 0.010     2013-12-25 22:22:25-0500 America/New_York
           fix github links
