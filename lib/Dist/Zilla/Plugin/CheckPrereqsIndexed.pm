@@ -1,8 +1,8 @@
 package Dist::Zilla::Plugin::CheckPrereqsIndexed;
-use Moose;
 # ABSTRACT: prevent a release if you have prereqs not found on CPAN
 
 use 5.10.0; # //
+use Moose;
 
 =head1 OVERVIEW
 
@@ -53,7 +53,7 @@ sub before_release {
 
   my @skips = map {; qr/$_/ } @{ $self->skips };
 
-  my %requirement;
+  my $requirements = CPAN::Meta::Requirements->new;
 
   # first level keys are phase; second level keys are types; we will just merge
   # everything -- rjbs, 2011-08-18
@@ -66,17 +66,12 @@ sub before_release {
 
       my $ver = $req_set->{$pkg};
 
-      $requirement{ $pkg } //= version->parse(0);
-
-      # we have a complex requirement or awful version -- rjbs, 2014-03-23
-      next REQ_PKG if not version::is_lax($ver);
-
-      $requirement{ $pkg } = $ver
-        if version->parse($ver) > $requirement{ $pkg };
+      $requirements->add_string_requirement($pkg => $ver);
     }
   }
 
-  return unless keys %requirement; # no prereqs!?
+  my @modules = $requirements->required_modules;
+  return unless @modules; # no prereqs!?
 
   require Encode;
   require LWP::UserAgent;
@@ -86,9 +81,9 @@ sub before_release {
   $ua->env_proxy;
 
   my %missing;
-  my %too_new;
+  my %unmet;
 
-  PKG: for my $pkg (sort keys %requirement) {
+  PKG: for my $pkg (sort @modules) {
     my $res = $ua->get("http://cpanidx.org/cpanidx/json/mod/$pkg");
     unless ($res->is_success) {
       $missing{ $pkg } = 1;
@@ -106,15 +101,15 @@ sub before_release {
     }
 
     my $indexed_version = version->parse($payload->[0]{mod_vers});
-    next PKG if $indexed_version >= $requirement{ $pkg };
+    next PKG if $requirements->accepts_module($pkg, $indexed_version->stringify);
 
-    $too_new{ $pkg } = {
-      required => $requirement{ $pkg },
+    $unmet{ $pkg } = {
+      required => $requirements->requirements_for_module($pkg),
       indexed  => $indexed_version,
     };
   }
 
-  unless (keys %missing or keys %too_new) {
+  unless (keys %missing or keys %unmet) {
     $self->log("all prereqs appear to be indexed");
     return;
   }
@@ -124,13 +119,13 @@ sub before_release {
     $self->log("the following prereqs could not be found on CPAN: @missing");
   }
 
-  if (keys %too_new) {
-    for my $pkg (sort keys %too_new) {
+  if (keys %unmet) {
+    for my $pkg (sort keys %unmet) {
       $self->log([
         "you required %s version %s but CPAN only has version %s",
         $pkg,
-        "$too_new{$pkg}{required}",
-        "$too_new{$pkg}{indexed}",
+        "$unmet{$pkg}{required}",
+        "$unmet{$pkg}{indexed}",
       ]);
     }
   }
