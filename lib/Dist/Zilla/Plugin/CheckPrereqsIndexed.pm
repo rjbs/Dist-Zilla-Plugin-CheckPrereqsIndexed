@@ -73,9 +73,8 @@ sub before_release {
   my @modules = $requirements->required_modules;
   return unless @modules; # no prereqs!?
 
-  require Encode;
   require LWP::UserAgent;
-  require JSON;
+  require JSON::MaybeXS;
 
   my $ua = LWP::UserAgent->new(keep_alive => 1);
   $ua->env_proxy;
@@ -90,10 +89,7 @@ sub before_release {
       next PKG;
     }
 
-    # JSON wants UTF-8 bytestreams, so we need to re-encode no matter what
-    # encoding we got. -- rjbs, 2011-08-18
-    my $yaml_octets = Encode::encode_utf8($res->decoded_content);
-    my $payload = JSON::->new->decode($yaml_octets);
+    my $payload = JSON::MaybeXS->new(utf8 => 0)->decode($res->decoded_content);
 
     unless (@$payload) {
       $missing{ $pkg } = 1;
