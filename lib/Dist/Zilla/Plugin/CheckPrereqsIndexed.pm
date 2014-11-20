@@ -73,34 +73,29 @@ sub before_release {
   my @modules = $requirements->required_modules;
   return unless @modules; # no prereqs!?
 
-  require Encode;
-  require LWP::UserAgent;
-  require JSON;
+  require HTTP::Tiny;
+  require YAML::Tiny;
 
-  my $ua = LWP::UserAgent->new(keep_alive => 1);
-  $ua->env_proxy;
+  my $ua = HTTP::Tiny->new;
 
   my %missing;
   my %unmet;
 
   PKG: for my $pkg (sort @modules) {
-    my $res = $ua->get("http://cpanidx.org/cpanidx/json/mod/$pkg");
-    unless ($res->is_success) {
+    my $res = $ua->get("http://cpanmetadb.plackperl.org/v1.0/package/$pkg");
+    unless ($res->{success}) {
       $missing{ $pkg } = 1;
       next PKG;
     }
 
-    # JSON wants UTF-8 bytestreams, so we need to re-encode no matter what
-    # encoding we got. -- rjbs, 2011-08-18
-    my $yaml_octets = Encode::encode_utf8($res->decoded_content);
-    my $payload = JSON::->new->decode($yaml_octets);
+    my $payload = YAML::Tiny->read_string( $res->{content} );
 
     unless (@$payload) {
       $missing{ $pkg } = 1;
       next PKG;
     }
 
-    my $indexed_version = version->parse($payload->[0]{mod_vers});
+    my $indexed_version = version->parse($payload->[0]{version});
     next PKG if $requirements->accepts_module($pkg, $indexed_version->stringify);
 
     $unmet{ $pkg } = {
