@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - switch from cpanidx index to cpanmetadb index
+        - use HTTP::Tiny instead of LWP (Fixes #7)
+        - use YAML::Tiny instead of JSON (Fixes #10)
 
 0.012     2014-04-28 10:27:28-04:00 America/New_York
         - no changes from trial release
