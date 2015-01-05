@@ -61,6 +61,7 @@ sub before_release {
     REQ_PKG: for my $pkg (keys %$req_set) {
       next if $pkg eq 'Config'; # special case -- rjbs, 2011-05-20
       next if $pkg eq 'perl';   # special case -- rjbs, 2011-02-05
+      next if $pkg eq 'integer';   # special case -- drolsky, 2015-01-05
 
       next if any { $pkg =~ $_ } @skips;
 
