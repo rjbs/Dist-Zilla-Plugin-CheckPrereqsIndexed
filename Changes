@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - add more unindexed modules, stolen from PromptIfStale
 
 0.014     2015-01-15 21:47:16-05:00 America/New_York
         - integer.pm is also a magic non-indexed module
