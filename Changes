@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - documentation fixes (thanks, Sebastian Deseille)
 
 0.015     2015-01-30 18:17:05+01:00 Europe/Brussels
         - add more unindexed modules, stolen from PromptIfStale

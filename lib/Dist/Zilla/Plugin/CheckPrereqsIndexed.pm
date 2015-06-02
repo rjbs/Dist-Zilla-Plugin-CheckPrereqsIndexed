@@ -14,9 +14,10 @@ index to ensure that they're all real, installable packages.
 
 If any are unknown, it will prompt the user to continue or abort.
 
-Previously, CheckPrereqsIndexed queried CPANIDX, but as the author had foreseen
-this behavior has changed. Now it use cpanmetadb. In the meantime, this makes
-releasing while offline impossible... but it was anyway, right?
+Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries 
+cpanmetadb. This behavior may change again in the future, or it may become
+pluggable.  In the meantime, this makes releasing while offline impossible...
+but it was anyway, right?
 
 =cut
 
