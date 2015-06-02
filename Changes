@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.016     2015-06-02 19:15:31-04:00 America/New_York
         - documentation fixes (thanks, Sebastian Deseille)
 
 0.015     2015-01-30 18:17:05+01:00 Europe/Brussels
