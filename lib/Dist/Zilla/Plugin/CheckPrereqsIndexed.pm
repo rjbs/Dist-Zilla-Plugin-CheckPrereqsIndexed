@@ -89,8 +89,12 @@ sub before_release {
   PKG: for my $pkg (sort @modules) {
     my $res = $ua->get("http://cpanmetadb.plackperl.org/v1.0/package/$pkg");
     unless ($res->{success}) {
-      $missing{ $pkg } = 1;
-      next PKG;
+      if ($res->{status} == 404) { # Not found
+        $missing{ $pkg } = 1;
+        next PKG;
+      }
+      chomp($res->{content});
+      $self->log_fatal(['%s %s: %s', $res->{status}, $res->{reason}, $res->{content}]);
     }
 
     my $payload = YAML::Tiny->read_string( $res->{content} );
