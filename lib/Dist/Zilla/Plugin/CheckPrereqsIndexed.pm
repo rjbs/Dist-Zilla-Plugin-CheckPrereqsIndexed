@@ -51,6 +51,8 @@ my %NOT_INDEXED = map {; $_ => 1 }
 sub before_release {
   my ($self) = @_;
 
+  $self->log("checking");
+
   require version;
 
   my $prereqs_hash  = $self->zilla->prereqs->as_string_hash;
