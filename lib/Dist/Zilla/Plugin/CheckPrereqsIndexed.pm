@@ -23,7 +23,7 @@ but it was anyway, right?
 
 with 'Dist::Zilla::Role::BeforeRelease';
 
-use List::MoreUtils qw(any uniq);
+use List::Util 1.33 qw(any);
 
 use namespace::autoclean;
 
