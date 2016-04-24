@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.018     2016-04-24 15:04:07+01:00 Europe/London
         - use 'any' from List::Util
 
 0.016     2015-06-02 19:15:31-04:00 America/New_York
