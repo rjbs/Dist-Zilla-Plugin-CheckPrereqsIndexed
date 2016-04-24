@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - use 'any' from List::Util
 
 0.016     2015-06-02 19:15:31-04:00 America/New_York
         - documentation fixes (thanks, Sebastian Deseille)
