@@ -55,8 +55,6 @@ sub before_release {
 
   require version;
 
-  my $prereqs_hash  = $self->zilla->prereqs->as_string_hash;
-
   my @skips = map {; qr/$_/ } @{ $self->skips };
 
   my $requirements = CPAN::Meta::Requirements->new;
@@ -71,30 +69,33 @@ sub before_release {
     %self_modules = ( $pkg => $self->zilla->version );
   }
 
-  # first level keys are phase; second level keys are types; we will just merge
-  # (almost) everything -- rjbs, 2011-08-18
-  for my $phase (keys %$prereqs_hash) {
-    for my $type (keys %{$prereqs_hash->{$phase}}) {
-      REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
-        if ($NOT_INDEXED{ $pkg }) {
-          $self->log_debug([ 'skipping unindexed module %s', $pkg ]);
-          next;
+  for my $prereqs_hash (
+    $self->zilla->prereqs->as_string_hash,
+    (map { $_->{prereqs} } values %{ $self->zilla->distmeta->{optional_features} // {} }),
+  ) {
+    for my $phase (keys %$prereqs_hash) {
+      for my $type (keys %{$prereqs_hash->{$phase}}) {
+        REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
+          if ($NOT_INDEXED{ $pkg }) {
+            $self->log_debug([ 'skipping unindexed module %s', $pkg ]);
+            next;
+          }
+
+          if (any { $pkg =~ $_ } @skips) {
+            $self->log_debug([ 'explicitly skipping module %s', $pkg ]);
+            next;
+          }
+
+          my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
+
+          # skip packages contained in the distribution we are releasing, from develop prereqs only
+          if ($phase eq 'develop' and exists $self_modules{$pkg} and $self_modules{$pkg} >= $ver) {
+            $self->log_debug([ 'skipping develop prereq on ourself (%s => %s)', $pkg, $ver ]);
+            next;
+          }
+
+          $requirements->add_string_requirement($pkg => $ver);
         }
-
-        if (any { $pkg =~ $_ } @skips) {
-          $self->log_debug([ 'explicitly skipping module %s', $pkg ]);
-          next;
-        }
-
-        my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
-
-        # skip packages contained in the distribution we are releasing, from develop prereqs only
-        if ($phase eq 'develop' and exists $self_modules{$pkg} and $self_modules{$pkg} >= $ver) {
-          $self->log_debug([ 'skipping develop prereq on ourself (%s => %s)', $pkg, $ver ]);
-          next;
-        }
-
-        $requirements->add_string_requirement($pkg => $ver);
       }
     }
   }
