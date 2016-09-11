@@ -63,15 +63,17 @@ sub before_release {
 
   # first level keys are phase; second level keys are types; we will just merge
   # everything -- rjbs, 2011-08-18
-  for my $req_set (map { values %$_ } values %$prereqs_hash) {
-    REQ_PKG: for my $pkg (keys %$req_set) {
-      next if $NOT_INDEXED{ $pkg };
+  for my $phase (keys %$prereqs_hash) {
+    for my $type (keys %{$prereqs_hash->{$phase}}) {
+      REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
+        next if $NOT_INDEXED{ $pkg };
 
-      next if any { $pkg =~ $_ } @skips;
+        next if any { $pkg =~ $_ } @skips;
 
-      my $ver = $req_set->{$pkg};
+        my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
 
-      $requirements->add_string_requirement($pkg => $ver);
+        $requirements->add_string_requirement($pkg => $ver);
+      }
     }
   }
 
