@@ -2,9 +2,6 @@ use strict;
 use warnings;
 use Test::More 0.88;
 use Test::Fatal;
-
-use lib 't/lib';
-
 use Test::DZil;
 
 sub new_tzil {
