@@ -66,9 +66,15 @@ sub before_release {
   for my $phase (keys %$prereqs_hash) {
     for my $type (keys %{$prereqs_hash->{$phase}}) {
       REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
-        next if $NOT_INDEXED{ $pkg };
+        if ($NOT_INDEXED{ $pkg }) {
+          $self->log_debug([ 'skipping unindexed module %s', $pkg ]);
+          next;
+        }
 
-        next if any { $pkg =~ $_ } @skips;
+        if (any { $pkg =~ $_ } @skips) {
+          $self->log_debug([ 'explicitly skipping module %s', $pkg ]);
+          next;
+        }
 
         my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
 
