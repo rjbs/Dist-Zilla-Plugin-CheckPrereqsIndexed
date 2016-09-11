@@ -61,8 +61,18 @@ sub before_release {
 
   my $requirements = CPAN::Meta::Requirements->new;
 
+  # find the package => version for all modules in this distribution
+  my $provides = $self->zilla->distmeta->{provides} // {};
+  my %self_modules = map { $_ => $provides->{$_}{version} } keys %$provides;
+
+  if (not keys %self_modules) {
+    (my $pkg = $self->zilla->name) =~ s/-/::/g;
+    $self->log_debug([ 'no "provides" metadata; guessing distribution contains module %s', $pkg ]);
+    %self_modules = ( $pkg => $self->zilla->version );
+  }
+
   # first level keys are phase; second level keys are types; we will just merge
-  # everything -- rjbs, 2011-08-18
+  # (almost) everything -- rjbs, 2011-08-18
   for my $phase (keys %$prereqs_hash) {
     for my $type (keys %{$prereqs_hash->{$phase}}) {
       REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
@@ -77,6 +87,12 @@ sub before_release {
         }
 
         my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
+
+        # skip packages contained in the distribution we are releasing, from develop prereqs only
+        if ($phase eq 'develop' and exists $self_modules{$pkg} and $self_modules{$pkg} >= $ver) {
+          $self->log_debug([ 'skipping develop prereq on ourself (%s => %s)', $pkg, $ver ]);
+          next;
+        }
 
         $requirements->add_string_requirement($pkg => $ver);
       }
