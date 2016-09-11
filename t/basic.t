@@ -4,6 +4,8 @@ use Test::More 0.88;
 use Test::Fatal;
 use Test::DZil;
 
+use if !$ENV{AUTHOR_TESTING}, 'Test::RequiresInternet' => ('http://cpanmetadb.plackperl.org' => 80);
+
 sub new_tzil {
   my ($corpus_dir, @skips) = @_;
   my $tzil = Builder->from_config(
