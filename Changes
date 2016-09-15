@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - fixed missing test prereq from 0.019 (Karen Etheridge)
 
 0.019     2016-09-14 23:09:47-04:00 America/New_York
         - also check prereqs from optional features (thanks, Karen Etheridge)
