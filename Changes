@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - also check prereqs from optional features (thanks, Karen Etheridge)
+        - don't check modules that would be satisfied by this release
+          (thanks, Karen Etheridge)
 
 0.018     2016-04-24 15:04:07+01:00 Europe/London
         - use 'any' from List::Util
