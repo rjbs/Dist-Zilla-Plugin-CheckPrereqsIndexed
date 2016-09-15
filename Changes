@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.020     2016-09-15 18:51:41-04:00 America/New_York
         - fixed missing test prereq from 0.019 (Karen Etheridge)
 
 0.019     2016-09-14 23:09:47-04:00 America/New_York
