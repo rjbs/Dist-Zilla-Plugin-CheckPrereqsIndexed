@@ -6,7 +6,7 @@ use Test::DZil;
 use Test::Fatal;
 use Test::Deep;
 
-use if !$ENV{AUTHOR_TESTING}, 'Test::RequiresInternet' => ('http://cpanmetadb.plackperl.org' => 80);
+use if !$ENV{AUTHOR_TESTING}, 'Test::RequiresInternet' => ('cpanmetadb.plackperl.org' => 80);
 
 my $dist_version = '0.005';
 
