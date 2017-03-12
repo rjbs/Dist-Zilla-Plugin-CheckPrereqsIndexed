@@ -14,7 +14,7 @@ index to ensure that they're all real, installable packages.
 
 If any are unknown, it will prompt the user to continue or abort.
 
-Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries 
+Previously, CheckPrereqsIndexed queried CPANIDX, but it now queries
 cpanmetadb. This behavior may change again in the future, or it may become
 pluggable.  In the meantime, this makes releasing while offline impossible...
 but it was anyway, right?
@@ -88,8 +88,13 @@ sub before_release {
 
           my $ver = $prereqs_hash->{$phase}{$type}{$pkg};
 
-          # skip packages contained in the distribution we are releasing, from develop prereqs only
-          if ($phase eq 'develop' and exists $self_modules{$pkg} and $self_modules{$pkg} >= $ver) {
+          # skip packages contained in the distribution we are releasing, from
+          # develop prereqs only
+          if (
+            $phase eq 'develop'
+            and exists $self_modules{$pkg}
+            and version->parse($self_modules{$pkg}) >= version->parse($ver)
+          ) {
             $self->log_debug([ 'skipping develop prereq on ourself (%s => %s)', $pkg, $ver ]);
             next;
           }
