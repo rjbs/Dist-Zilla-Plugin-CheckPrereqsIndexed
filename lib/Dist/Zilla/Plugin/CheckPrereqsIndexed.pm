@@ -1,8 +1,16 @@
 package Dist::Zilla::Plugin::CheckPrereqsIndexed;
 # ABSTRACT: prevent a release if you have prereqs not found on CPAN
 
-use 5.10.0; # //
 use Moose;
+with 'Dist::Zilla::Role::BeforeRelease';
+
+# BEGIN BOILERPLATE
+use v5.20.0;
+use warnings;
+use utf8;
+no feature 'switch';
+use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
+# END BOILERPLATE
 
 =head1 OVERVIEW
 
@@ -21,8 +29,6 @@ but it was anyway, right?
 
 =cut
 
-with 'Dist::Zilla::Role::BeforeRelease';
-
 use List::Util 1.33 qw(any);
 
 use namespace::autoclean;
@@ -32,17 +38,18 @@ sub mvp_aliases { return { skip => 'skips' } }
 
 =attr skips
 
-This is an arrayref of regular expressions.  Any module names matching
-any of these regex will not be checked.  This should only be necessary
-if you have a prerequisite that is not available on CPAN (because it's
-distributed in some other way).
+This is an array of regular expressions.  Any module names matching any of
+these regex will not be checked.  This should only be necessary if you have a
+prerequisite that is not available on CPAN (because it's distributed in some
+other way).
 
 =cut
 
 has skips => (
-  is      => 'ro',
   isa     => 'ArrayRef[Str]',
   default => sub { [] },
+  traits  => [ 'Array' ],
+  handles => { skips => 'elements' },
 );
 
 my %NOT_INDEXED = map {; $_ => 1 }
@@ -55,7 +62,7 @@ sub before_release {
 
   require version;
 
-  my @skips = map {; qr/$_/ } @{ $self->skips };
+  my @skips = map {; qr/$_/ } $self->skips;
 
   my $requirements = CPAN::Meta::Requirements->new;
 
@@ -71,11 +78,11 @@ sub before_release {
 
   for my $prereqs_hash (
     $self->zilla->prereqs->as_string_hash,
-    (map { $_->{prereqs} } values %{ $self->zilla->distmeta->{optional_features} // {} }),
+    (map { $_->{prereqs} } values(($self->zilla->distmeta->{optional_features} // {})->%*)),
   ) {
     for my $phase (keys %$prereqs_hash) {
-      for my $type (keys %{$prereqs_hash->{$phase}}) {
-        REQ_PKG: for my $pkg (keys %{$prereqs_hash->{$phase}{$type}}) {
+      for my $type (keys $prereqs_hash->{$phase}->%*) {
+        REQ_PKG: for my $pkg (keys $prereqs_hash->{$phase}{$type}->%*) {
           if ($NOT_INDEXED{ $pkg }) {
             $self->log_debug([ 'skipping unindexed module %s', $pkg ]);
             next;
